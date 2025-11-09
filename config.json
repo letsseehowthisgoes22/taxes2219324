@@ -2,12 +2,12 @@
   "owners": [
     {
       "name": "Brendan Wilder",
-      "aliases": ["Brendan Boone Wilder", "Brendan", "B Wilder", "B. Wilder"],
+      "aliases": ["Brendan Boone Wilder", "Boone Wilder", "Brendan", "Boone", "B Wilder", "B. Wilder", "B Boone Wilder"],
       "share": 0.5
     },
     {
       "name": "Robert Tredinnick",
-      "aliases": ["Bobby Tredinnick", "Bobby", "R Tredinnick", "R. Tredinnick"],
+      "aliases": ["Bobby Tredinnick", "Robert", "Bobby", "R Tredinnick", "R. Tredinnick", "Bob Tredinnick"],
       "share": 0.5
     }
   ],
@@ -42,7 +42,21 @@
     ],
     "distribution_keywords": [
       "zelle"
-    ]
+    ],
+    "small_expense_keywords": [
+      "subscription",
+      "software",
+      "fee",
+      "monthly",
+      "annual"
+    ],
+    "refund_keywords": [
+      "refund",
+      "refunded",
+      "reversal",
+      "return"
+    ],
+    "paypal_small_expense_threshold": 200.00
   },
   "duplicate_detection": {
     "amount_tolerance": 0.01,

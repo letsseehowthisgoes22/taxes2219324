@@ -26,6 +26,10 @@ pip install -r requirements.txt
 
 ## Usage
 
+**NEW USER?** Read the [Complete Step-by-Step Guide (HOW_TO_USE.md)](HOW_TO_USE.md) for detailed beginner-friendly instructions.
+
+### Quick Start
+
 1. Create a folder for your statements (e.g., `statements/`)
 2. Place your CSV files in the folder with clear names:
    - Files containing "paypal" in the name → PayPal transactions
@@ -42,7 +46,9 @@ python tax_processor.py statements/
      - All Transactions (categorized)
      - P&L Statement
      - Owner Distributions
-     - Account Summaries
+     - Staff Payment Details
+     - Expense Breakdown
+     - Revenue Details
 
 ## Transaction Categories
 
@@ -50,14 +56,20 @@ python tax_processor.py statements/
 - Incoming PayPal invoices from clients
 - Direct deposits to Chase Checking from clients
 
+### Staff Payments
+- PayPal outgoing payments (unless small expenses or refunds)
+- Automatically categorized as staff payments unless:
+  - Amount is under $200 AND matches subscription/software keywords
+  - Transaction is a refund
+
 ### Expenses
-- PayPal payments to staff
-- PayPal bill payments
+- PayPal subscriptions/software under $200 (Adobe, Zoom, etc.)
 - Chase Credit Card charges
 - Chase Checking bill payments
+- Bank fees
 
 ### Distributions
-- Zelle transfers to owners (Brendan Wilder, Robert Tredinnick)
+- Zelle transfers to owners (Brendan/Boone Wilder, Bobby/Robert Tredinnick)
 
 ### Transfers
 - Money moved between PayPal and Chase Checking (neutral, not revenue/expense)

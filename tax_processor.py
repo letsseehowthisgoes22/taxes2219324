@@ -211,6 +211,41 @@ class TaxProcessor:
 
         return has_revenue_keyword
 
+    def is_small_expense(self, row):
+        """Check if transaction is a small expense (subscription, fee, etc.)"""
+        desc = str(row['description']).lower() + ' ' + str(row['type']).lower()
+        amount = abs(row['amount'])
+
+        # Check if amount is below threshold
+        if amount > self.rules['paypal_small_expense_threshold']:
+            return False
+
+        # Check for small expense keywords
+        small_expense_keywords = self.rules.get('small_expense_keywords', [])
+        return any(keyword in desc for keyword in small_expense_keywords)
+
+    def is_refund(self, row):
+        """Check if transaction is a refund"""
+        desc = str(row['description']).lower() + ' ' + str(row['type']).lower()
+        refund_keywords = self.rules.get('refund_keywords', [])
+        return any(keyword in desc for keyword in refund_keywords)
+
+    def is_staff_payment(self, row):
+        """Check if transaction is a staff payment"""
+        # Only applies to PayPal outgoing payments
+        if row['account'] != 'paypal' or row['amount'] >= 0:
+            return False
+
+        # Not a transfer, distribution, small expense, or refund
+        if self.is_transfer(row) or self.is_owner_distribution(row):
+            return False
+
+        if self.is_small_expense(row) or self.is_refund(row):
+            return False
+
+        # Default: PayPal outgoing payments are staff payments
+        return True
+
     def is_expense(self, row):
         """Check if transaction is an expense"""
         # Expenses are negative amounts (money going out)
@@ -221,8 +256,16 @@ class TaxProcessor:
         if self.is_owner_distribution(row) or self.is_transfer(row):
             return False
 
+        # Not a staff payment (staff payments are categorized separately)
+        if self.is_staff_payment(row):
+            return False
+
         # Credit card charges are expenses
         if row['account'] == 'chase_credit':
+            return True
+
+        # PayPal small expenses
+        if row['account'] == 'paypal' and self.is_small_expense(row):
             return True
 
         # Everything else that's negative is an expense
@@ -240,6 +283,8 @@ class TaxProcessor:
                 cat = 'Distribution'
             elif self.is_revenue(row):
                 cat = 'Revenue'
+            elif self.is_staff_payment(row):
+                cat = 'Staff Payment'
             elif self.is_expense(row):
                 cat = 'Expense'
             else:
@@ -251,7 +296,7 @@ class TaxProcessor:
 
         # Print summary
         print("\nCategorization Summary:")
-        for cat in ['Revenue', 'Expense', 'Distribution', 'Transfer', 'Uncategorized']:
+        for cat in ['Revenue', 'Staff Payment', 'Expense', 'Distribution', 'Transfer', 'Uncategorized']:
             count = len(df[df['category'] == cat])
             total = df[df['category'] == cat]['amount'].sum()
             print(f"  {cat}: {count} transactions, Total: ${total:,.2f}")
@@ -262,10 +307,12 @@ class TaxProcessor:
         """Generate Profit & Loss statement"""
         # Calculate totals
         revenue = df[df['category'] == 'Revenue']['amount'].sum()
-        expenses = abs(df[df['category'] == 'Expense']['amount'].sum())
+        staff_payments = abs(df[df['category'] == 'Staff Payment']['amount'].sum())
+        other_expenses = abs(df[df['category'] == 'Expense']['amount'].sum())
+        total_expenses = staff_payments + other_expenses
         distributions = abs(df[df['category'] == 'Distribution']['amount'].sum())
 
-        net_income = revenue - expenses
+        net_income = revenue - total_expenses
 
         # Create P&L DataFrame
         pl_data = {
@@ -274,6 +321,8 @@ class TaxProcessor:
                 'Total Revenue',
                 '',
                 'EXPENSES',
+                '  Staff Payments',
+                '  Other Expenses',
                 'Total Expenses',
                 '',
                 'NET INCOME (before distributions)',
@@ -288,7 +337,9 @@ class TaxProcessor:
                 revenue,
                 '',
                 '',
-                expenses,
+                staff_payments,
+                other_expenses,
+                total_expenses,
                 '',
                 net_income,
                 '',
@@ -356,6 +407,11 @@ class TaxProcessor:
             revenue_df = df[df['category'] == 'Revenue'][['date', 'description', 'amount', 'account']].copy()
             revenue_df = revenue_df.sort_values('date')
             revenue_df.to_excel(writer, sheet_name='Revenue Details', index=False)
+
+            # Staff Payment Details
+            staff_df = df[df['category'] == 'Staff Payment'][['date', 'description', 'amount', 'account']].copy()
+            staff_df = staff_df.sort_values('date')
+            staff_df.to_excel(writer, sheet_name='Staff Payment Details', index=False)
 
             # Distribution Details
             dist_df = df[df['category'] == 'Distribution'][['date', 'description', 'amount', 'account']].copy()
@@ -436,12 +492,16 @@ class TaxProcessor:
         print("SUMMARY")
         print("=" * 60)
         revenue = combined_df[combined_df['category'] == 'Revenue']['amount'].sum()
-        expenses = abs(combined_df[combined_df['category'] == 'Expense']['amount'].sum())
+        staff_payments = abs(combined_df[combined_df['category'] == 'Staff Payment']['amount'].sum())
+        other_expenses = abs(combined_df[combined_df['category'] == 'Expense']['amount'].sum())
+        total_expenses = staff_payments + other_expenses
         distributions = abs(combined_df[combined_df['category'] == 'Distribution']['amount'].sum())
-        net_income = revenue - expenses
+        net_income = revenue - total_expenses
 
         print(f"Total Revenue:        ${revenue:>15,.2f}")
-        print(f"Total Expenses:       ${expenses:>15,.2f}")
+        print(f"  Staff Payments:     ${staff_payments:>15,.2f}")
+        print(f"  Other Expenses:     ${other_expenses:>15,.2f}")
+        print(f"Total Expenses:       ${total_expenses:>15,.2f}")
         print(f"Net Income:           ${net_income:>15,.2f}")
         print(f"Distributions:        ${distributions:>15,.2f}")
         print(f"Retained Earnings:    ${net_income - distributions:>15,.2f}")
