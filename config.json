@@ -1,0 +1,72 @@
+{
+  "owners": [
+    {
+      "name": "Brendan Wilder",
+      "aliases": ["Brendan Boone Wilder", "Brendan", "B Wilder", "B. Wilder"],
+      "share": 0.5
+    },
+    {
+      "name": "Robert Tredinnick",
+      "aliases": ["Bobby Tredinnick", "Bobby", "R Tredinnick", "R. Tredinnick"],
+      "share": 0.5
+    }
+  ],
+  "transaction_rules": {
+    "revenue_keywords": [
+      "invoice",
+      "payment received",
+      "payment from",
+      "deposit",
+      "client payment"
+    ],
+    "expense_keywords": [
+      "payment to",
+      "withdrawal",
+      "purchase",
+      "subscription",
+      "software",
+      "office",
+      "supplies"
+    ],
+    "staff_keywords": [
+      "staff",
+      "contractor",
+      "freelancer",
+      "employee"
+    ],
+    "transfer_keywords": [
+      "transfer from paypal",
+      "transfer to checking",
+      "bank transfer",
+      "instant transfer"
+    ],
+    "distribution_keywords": [
+      "zelle"
+    ]
+  },
+  "duplicate_detection": {
+    "amount_tolerance": 0.01,
+    "date_window_days": 3,
+    "description_similarity_threshold": 0.7
+  },
+  "csv_formats": {
+    "paypal": {
+      "date_columns": ["Date", "date", "Transaction Date"],
+      "amount_columns": ["Net", "net", "Amount", "amount"],
+      "description_columns": ["Name", "name", "Description", "description", "Type"],
+      "type_columns": ["Type", "type", "Transaction Type"]
+    },
+    "chase_checking": {
+      "date_columns": ["Posting Date", "Transaction Date", "Date"],
+      "amount_columns": ["Amount", "amount"],
+      "description_columns": ["Description", "description", "Details"],
+      "type_columns": ["Type", "type"]
+    },
+    "chase_credit": {
+      "date_columns": ["Transaction Date", "Post Date", "Date"],
+      "amount_columns": ["Amount", "amount"],
+      "description_columns": ["Description", "description", "Merchant"],
+      "type_columns": ["Type", "type", "Category"]
+    }
+  }
+}

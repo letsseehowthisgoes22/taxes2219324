@@ -1,0 +1,9 @@
+Date,Name,Type,Status,Currency,Gross,Fee,Net,From Email Address,To Email Address
+01/05/2024,Client ABC Corp,Payment Received,Completed,USD,5000.00,-145.00,4855.00,client@abccorp.com,business@email.com
+01/08/2024,Staff Member Jane Doe,Payment Sent,Completed,USD,-800.00,0.00,-800.00,business@email.com,jane@email.com
+01/12/2024,Client XYZ LLC,Payment Received,Completed,USD,3500.00,-101.50,3398.50,client@xyzllc.com,business@email.com
+01/15/2024,Adobe Subscription,Payment Sent,Completed,USD,-54.99,0.00,-54.99,business@email.com,adobe@adobe.com
+01/18/2024,Transfer to Bank,Instant Transfer,Completed,USD,-8000.00,-20.00,-8020.00,business@email.com,
+01/22/2024,Staff Member John Smith,Payment Sent,Completed,USD,1200.00,0.00,-1200.00,business@email.com,john@email.com
+01/25/2024,Client Tech Solutions,Payment Received,Completed,USD,6200.00,-180.00,6020.00,client@techsol.com,business@email.com
+01/28/2024,Zoom Subscription,Payment Sent,Completed,USD,-15.99,0.00,-15.99,business@email.com,zoom@zoom.us
